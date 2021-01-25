@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <script type="text/javascript" src="/js/twilio.min.js"></script>
+        <link rel="stylesheet" href="/style.css"
+    </head>
+    <body>
+        <input id="init" type="submit" value="初期化" />
+        <form id="dialForm">
+            <div>
+                <label>発信先：</label>
+                <input id="to" type="password" name="number"/>
+            </div>
+            <div>
+                <input id="call" disabled="true" type="submit" value="発信"/>
+                <input id="disconnect" disabled="true" type="submit" value="終了"/>
+            </div>
+        </form>
+    </body>
+
+    <script type="text/javascript" src="voice.js"></script>
+</html>
