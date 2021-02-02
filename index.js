@@ -8,11 +8,12 @@ const ngrok = require('ngrok');
 
 // Twilio関連はここから
 const twilio = require('twilio');
-const ClientCapability = twilio.jwt.ClientCapability;
+const AccessToken = twilio.jwt.AccessToken;
+const VoiceGrant = AccessToken.VoiceGrant;
 const VoiceResponse = twilio.twiml.VoiceResponse;
 
 // .envファイルから環境変数を取得
-const {TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_NUMBER, TWIML_APP_SID} = process.env;
+const {TWILIO_ACCOUNT_SID, TWILIO_NUMBER, TWILIO_API_KEY, TWILIO_API_SECRET, TWIML_APP_SID} = process.env;
 
 
 // express app
@@ -24,20 +25,25 @@ app.use('/js/twilio.min.js', (req, res) => {
     res.sendFile(path.join(__dirname, 'node_modules/twilio-client/dist/twilio.min.js'));
 });
 
-//Client Capabilityトークンを生成しクライアントに渡す。
+//Accessトークンを生成しクライアントに渡す。
 app.get('/token', (req, res) => {
-    const capability = new ClientCapability({
-        accountSid: TWILIO_ACCOUNT_SID,
-        authToken: TWILIO_AUTH_TOKEN
+
+    const identity = 'user';
+
+    const voiceGrant = new VoiceGrant({
+        outgoingApplicationSid: TWIML_APP_SID,
+        incomingAllow: false
     });
-    // 外部発信のみを有効化
-    capability.addScope(
-        new ClientCapability.OutgoingClientScope({
-            applicationSid: TWIML_APP_SID
-        })
+    
+    const token = new AccessToken(
+        TWILIO_ACCOUNT_SID,
+        TWILIO_API_KEY,
+        TWILIO_API_SECRET,
+        { identity:  identity}
     );
-    const token = capability.toJwt();
-    res.send({ token: token});
+    token.addGrant(voiceGrant);
+
+    res.send({ token: token.toJwt()});
 });
 
 // TwiMLAppからこちらにリクエストが渡ってくる。ここでは渡された番号に対して接続する。
