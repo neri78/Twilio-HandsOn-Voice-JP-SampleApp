@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(urlencoded({extended: false}));
 
 app.use('/js/twilio.min.js', (req, res) => {
-    res.sendFile(path.join(__dirname, 'node_modules/twilio-client/dist/twilio.min.js'));
+    res.sendFile(path.join(__dirname, 'node_modules/@twilio/voice-sdk/dist/twilio.min.js'));
 });
 
 //Accessトークンを生成しクライアントに渡す。

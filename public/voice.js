@@ -1,9 +1,11 @@
 'use strict';
+
 // UI部分
 const InitButton = document.getElementById('init');
 const ToField = document.getElementById('to');
 const CallButton = document.getElementById('call');
 const DisconnectButton = document.getElementById('disconnect');
+let device;
 
 // 初期化ボタンをクリックするとClient Capability Tokenを取得し、Twilio.Deviceを初期化する。
 InitButton.addEventListener('click', async() => {
@@ -15,11 +17,9 @@ InitButton.addEventListener('click', async() => {
     });
     
     let {token}  = await response.json();
-    Twilio.Device.setup(token);
-    Twilio.Device.on('ready', () => {
-        CallButton.disabled = false;
-        InitButton.disabled = true;
-    });
+    device = new Twilio.Device(token);
+    CallButton.disabled = false;
+    InitButton.disabled = true;
 });
 
 
@@ -33,13 +33,17 @@ dialForm.addEventListener('submit', (event) => {
     if (submitId === 'call') {
         const number = ToField.value;
         CallButton.disabled = true;
-        Twilio.Device.connect({ number: number});
+        device.connect({ 
+            params: {
+                number: number
+            }
+        });
         DisconnectButton.disabled = false;
     }
 
     // 終了ボタンがクリックされた場合は接続を終了する。
     else if (submitId === 'disconnect') {
-        Twilio.Device.disconnectAll();
+        device.disconnectAll();
         DisconnectButton.disabled = true;
         CallButton.disabled = false; 
     }
